@@ -1,0 +1,111 @@
+        # data is taken from Entry widget using get() method
+        
+        fname=firstNameEntry.get().lower()
+        lname=lastNameEntry.get().lower()
+        # converted into lower case as we want it to use for updating new password
+        
+        username=usernameEntry.get()
+        prn=prnEntry.get()
+        branch=branchEntry.get().lower()
+        passwd=passEntry.get()     
+        
+        
+        # let's connect to our database
+        db=MySQLdb.connect('localhost','root','','ostl')
+        
+        #let's now create a cursor for our db
+        cursor=db.cursor()   
+        
+        # this is a list of a particular batch
+        # only these members are allowed to create an account in moodle
+        #studentList=['116A1001','116A1002','116A1003','116A1004','116A1005','116A1006','116A1007','116A1008','116A1009','116A1010','116A1011','116A1012','116A1013','116A1014','116A1015','116A1016','116A1017','116A1018','116A1019']
+        studentPrn=[]
+        myusernameList=[]
+        sql="SELECT PRN,USERNAME FROM moodle"
+        try:
+            cursor.execute(sql)
+            result=list(cursor.fetchall())
+            for x in result:
+                studentPrn.append(x[0])
+                myusernameList.append(x[1])
+            print(studentPrn)
+        except:
+            pass
+            
+            
+            
+        # let's connect to our database
+        #db=MySQLdb.connect('localhost','root','','ostl')
+        
+        #let's now create a cursor for our db
+        #cursor=db.cursor()
+        
+        
+        #print(prn)
+            
+        # now it's time for us to insert this data into database if prn no is in list
+        # but let's first check whether the prn is from our batch or not
+        if (prn in studentPrn):
+            
+            # enter into database
+            sql="SELECT * FROM moodle WHERE PRN='%s'"%(prn)
+            try:
+                cursor.execute(sql)
+                    
+                # let's now create a list of our stored records
+                result=cursor.fetchall()
+                studentInfo=[]
+                for x in result:
+                    
+                    studentInfo.append(x[1])
+                    studentInfo.append(x[2])
+                    studentInfo.append(x[3])
+                    studentInfo.append(x[4])
+                    studentInfo.append(x[5])
+                    
+                print(studentInfo)
+                
+                # let's create a list of student's username that are currently existing into database
+                # this is done to avoid sharing common username
+                
+                
+                
+                
+                                   
+                # if user is not present into database then insert it
+                if((username not in myusernameList)and(studentInfo[3]!=None)):
+                    # then insert into database
+                    
+                    
+                    sql="""INSERT INTO moodle(
+                            FNAME,LNAME,USERNAME,BRANCH,PASSWORD)
+                            VALUES('%s','%s','%s','%s','%s')"""%(fname,lname,username,branch,passwd)
+                
+                    try:
+                        print("Connected successfully")
+                        cursor.execute(sql)
+                        
+                        db.commit()
+                        print("Hello")
+                        lbl=Label(newFrame,text="Account created successfully!",font=('Times',15,'bold'))
+                        lbl.pack()
+                    except:
+                        db.rollback()
+                        lbl=Label(newFrame,text="Sorry we are unable to connect!").pack()
+                        
+                else:
+                    lbl=Label(newFrame,text="Sorry this username is already taken",font=('Times',15,'bold'))
+                    lbl.pack(side=BOTTOM)
+                        
+            except:
+                lbl=Label(newFrame,text="Unable to connect")
+                lbl.pack()
+                
+        else:
+            lbl=Label(newFrame,text="Please fill correct details!",font=('Times',15,'bold italic'),fg="black")
+            lbl.pack()
+                        
+            
+        
+                
+        db.close()

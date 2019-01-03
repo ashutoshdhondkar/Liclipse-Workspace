@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Login|page</title>
+    </head>
+    <body>
+        <h1 align="center">Welcome to Facebook</h1>
+        <form align="center" method="POST" action="">
+        {% csrf_token %}
+            <label><h2>Name:</h2></label>
+            <input type="text" name="name">
+            <br><br>
+            <label><h2>Password: </h2></label>
+            <input type="password" name="password">
+            <br><br>
+            <input type="submit">  
+        </form>
+        <a href="{% url 'signin' %}" align="center"><h3>Click here to sign in</h3></a>
+    </body>
+</html>
